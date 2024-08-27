@@ -1,0 +1,54 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+from sklearn.naive_bayes import GaussianNB
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report
+
+
+
+Fip_Data = pd.read_csv("C:\\Users\\Windows 10\\.spyder-py3\\SONN (1).csv")
+df=Fip_Data
+x=df[['FEVER','WALKING DISORDER','WEAKNESS','SWELLING IN THE ABDOMINAL AREA','WEAKENING','REJECTING THE MEAL','DYSPNEA','REDUCED APPETITE','AVOID BEHAVIOR','SNEEZE','CONSTIPATTION','VOMITING','DIARRHEA']]
+y=df['DISEASE STATUS']
+df
+#veriyi eğitim ve test olarak ayırma
+x_train,x_test,y_train,y_test=train_test_split(x,y,test_size=.2,random_state=0)
+
+# Train veri seti kendi içinden (%10) validation bölümünü ayırıyor
+x_train, x_val, y_train, y_val = train_test_split(x_train, y_train,
+                                                  test_size = 0.1,
+                                                  shuffle = False)
+
+from imblearn.over_sampling import SMOTE
+sm=SMOTE(random_state=42)
+x_test,y_test= sm.fit_resample(x_train,y_train)
+
+
+
+clf=GaussianNB()
+clf.fit(x_train,y_train)
+
+y_pred=clf.predict(x_test)
+print(classification_report(y_test,y_pred))
+
+# GaussianNB sınıfından bir nesne ürettik
+gnb = GaussianNB()
+
+# Makineyi eğitiyoruz
+gnb.fit(x_train, y_train.ravel())
+
+# Test veri kümemizi verdik ve hastalığı tahmin etmesini sağladık
+result = gnb.predict(x_test)
+
+
+# Başarı Oranı
+from sklearn.metrics import accuracy_score
+accuracy = accuracy_score(y_test, result)
+print(accuracy)
+
+if accuracy>=0.95:
+    print("veterinere görünmeli")
+else:
+    print("hasta değil")
+
